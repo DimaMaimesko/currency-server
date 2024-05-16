@@ -2,6 +2,8 @@
 
 namespace App\Command;
 
+use App\Services\CurrencyConverter;
+use App\Services\HttpClient;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -16,7 +18,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 )]
 class GetRateCommand extends Command
 {
-    public function __construct()
+    public function __construct(private CurrencyConverter $currencyConverter)
     {
         parent::__construct();
     }
@@ -31,41 +33,14 @@ class GetRateCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $io = new SymfonyStyle($input, $output);
-        $arg1 = $input->getArgument('arg1');
 
-        if ($arg1) {
-            $io->note(sprintf('You passed an argument: %s', $arg1));
-        }
 
-        if ($input->getOption('option1')) {
-            // ...
-        }
+        $result = $this->currencyConverter->rate();
+        dd($result);
 
-        $client = new \GuzzleHttp\Client();
-        $response = $client->request('GET', 'https://bank.gov.ua/NBUStatService/v1/statdirectory/exchange?json');
-        $body = $response->getBody();
-        $bodyContents = $body->getContents(); // Get the body contents
-        $data = json_decode($bodyContents, true); // Convert to array
 
-        $cc_value_to_search = "USD";
-        $element = null;
-        foreach ($data as $entry) {
-            if ($entry['cc'] === $cc_value_to_search) {
-                $element = $entry;
-                break; // Exit the loop when the element is found
-            }
-        }
-        if ($element !== null) {
-            dd($element); // Output the data
-        } else {
-            echo "Element with cc=$cc_value_to_search not found";
-        }
-
-        dd('d'); // Output the data
-
-        $io->success('You have a new command! Now make it your own! Pass --help to see your options.');
 
         return Command::SUCCESS;
     }
 }
+

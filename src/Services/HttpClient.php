@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use GuzzleHttp\Client;
-use Psr\Http\Message\ResponseInterface;
 
 class HttpClient
 {
@@ -14,7 +13,12 @@ class HttpClient
 
     public function get(string $url): array
     {
-        $response = $this->client->request('GET', $url);
+        $headers = array(
+            'Accept' => 'application/json',
+        );
+        $response = $this->client->request('GET', $url, [
+            'headers' => $headers
+        ]);
         $bodyContents = $response->getBody()->getContents();
         if ($response->getStatusCode() !== 200) {
                 throw new \Exception('Request failed');
