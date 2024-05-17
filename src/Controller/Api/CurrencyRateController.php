@@ -17,7 +17,7 @@ class CurrencyRateController extends AbstractController
     {
     }
 
-    #[Route('/api/rate', name: 'get_currency_rate')]
+    #[Route('/api/rate', name: 'get_currency_rate', methods: ['GET'])]
     public function rates()
     {
         $convertor = new ChainConverter(
