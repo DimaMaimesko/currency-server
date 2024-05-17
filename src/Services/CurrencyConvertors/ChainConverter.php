@@ -14,7 +14,13 @@ class ChainConverter implements CurrencyConvertorInterface
     public function rate()
     {
         foreach ($this->currencyConvertors as $currencyConvertor) {
-            $rate = $currencyConvertor->rate();
+            $rate = null;
+            try {
+                $rate = $currencyConvertor->rate();
+            } catch (\Exception $e) {
+
+            }
+
             if ($rate !== null) {
                 return $rate;
             }

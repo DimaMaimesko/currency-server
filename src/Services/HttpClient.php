@@ -17,19 +17,30 @@ class HttpClient
             'Accept' => 'application/json',
         );
 
-        if ($apiKey !== null) {
-            $url .= "?access_key=".$apiKey;
+        $url = $this->prepareUrlWithParams($url, $apiKey);
+
+        $response = $this->client->request('GET', $url, ['headers' => $headers]);
+
+        if ($response->getStatusCode() !== 200) {
+            throw new \Exception('Request failed');
         }
 
-        $response = $this->client->request('GET', $url, [
-            'headers' => $headers,
-        ]);
         $bodyContents = $response->getBody()->getContents();
-        if ($response->getStatusCode() !== 200) {
-                throw new \Exception('Request failed');
-        }
 
         return json_decode($bodyContents, true);
+    }
+
+    private function prepareUrlWithParams(string $url, $apiKey): string
+    {
+        $params = [];
+        $existingParams = parse_url($url, PHP_URL_QUERY);
+        if ($existingParams) {
+            parse_str($existingParams, $params);
+        }
+        if ($apiKey !== null) {
+            $params['access_key'] = $apiKey;
+        }
+        return strtok($url, '?') . '?' . http_build_query($params);
     }
 
 }
