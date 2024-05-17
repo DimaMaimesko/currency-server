@@ -1,8 +1,10 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\CurrencyConvertors;
 
-class CurrencyConverter
+use App\Services\HttpClient;
+
+class NBUConverter implements CurrencyConvertorInterface
 {
     private $baseUri = 'https://bank.gov.ua/NBUStatService/v1/statdirectory/exchange?json';
     private $targetCurrency = 'USD';

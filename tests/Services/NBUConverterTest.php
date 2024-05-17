@@ -1,14 +1,18 @@
 <?php
 
-namespace Tests\Services;
+namespace  App\Tests\Services;
 
-use App\Services\CurrencyConverter;
+use App\Services\CurrencyConvertors\NBUConverter;
 use App\Services\HttpClient;
-use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 
-class CurrencyConverterTest extends TestCase
+class NBUConverterTest extends TestCase
 {
+    /**
+     * A basic test example.
+     * @group test
+     * @return void
+     */
     public function testSuccess(): void
     {
         $httpClientResponse = [
@@ -37,13 +41,18 @@ class CurrencyConverterTest extends TestCase
 
         $client = $this->createMock(HttpClient::class);
         $client->method('get')->willReturn($httpClientResponse);
-        $converter = new CurrencyConverter($client);
+        $converter = new NBUConverter($client);
 
         $result = $converter->rate();
 
         $this->assertEquals('39.4305', $result);
     }
 
+    /**
+     * A basic test example.
+     * @group test
+     * @return void
+     */
     public function testUSDNotFound(): void
     {
         $httpClientResponse = [
@@ -65,11 +74,12 @@ class CurrencyConverterTest extends TestCase
 
         $client = $this->createMock(HttpClient::class);
         $client->method('get')->willReturn($httpClientResponse);
-        $converter = new CurrencyConverter($client);
+        $converter = new NBUConverter($client);
 
         $result = $converter->rate();
 
         $this->assertNull($result);
     }
+
 
 }

@@ -11,13 +11,18 @@ class HttpClient
     }
 
 
-    public function get(string $url): array
+    public function get(string $url, $apiKey = null): array
     {
         $headers = array(
             'Accept' => 'application/json',
         );
+
+        if ($apiKey !== null) {
+            $url .= "?access_key=".$apiKey;
+        }
+
         $response = $this->client->request('GET', $url, [
-            'headers' => $headers
+            'headers' => $headers,
         ]);
         $bodyContents = $response->getBody()->getContents();
         if ($response->getStatusCode() !== 200) {
