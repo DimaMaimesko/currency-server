@@ -26,3 +26,7 @@ services:
     App\Services\CurrencyConvertors\FixerConverter:
         arguments:
             $fixerApiKey: '%env(FIXER_API_KEY)%'
+
+    # ...
+    App\Scheduler\Handler\SendDailyRatesReportsHandler:
+        tags: [messenger.message_handler]
