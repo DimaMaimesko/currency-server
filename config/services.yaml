@@ -30,3 +30,7 @@ services:
     # ...
     App\Scheduler\Handler\SendDailyRatesReportsHandler:
         tags: [messenger.message_handler]
+        
+    Mailtrap\Bridge\Transport\MailtrapTransportFactory:
+        tags:
+            - { name: 'mailer.transport_factory' }

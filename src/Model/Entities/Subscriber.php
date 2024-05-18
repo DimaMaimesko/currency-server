@@ -2,11 +2,11 @@
 
 namespace App\Model\Entities;
 
-use App\Repository\SubscriberRepository;
+use App\Repository\SubscribersRepository;
 use Doctrine\ORM\Mapping as ORM;
 use PHPUnit\Util\Exception;
 
-#[ORM\Entity(repositoryClass: SubscriberRepository::class)]
+#[ORM\Entity(repositoryClass: SubscribersRepository::class)]
 class Subscriber
 {
     #[ORM\Id]

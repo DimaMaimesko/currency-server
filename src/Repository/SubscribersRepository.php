@@ -39,4 +39,9 @@ class SubscribersRepository
         $this->entityManager->flush();
     }
 
+    public function all(): array
+    {
+        return $this->repo->findAll();
+    }
+
 }
