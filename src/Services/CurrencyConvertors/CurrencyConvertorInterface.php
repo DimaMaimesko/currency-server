@@ -4,6 +4,6 @@ namespace App\Services\CurrencyConvertors;
 
 interface CurrencyConvertorInterface
 {
-    public function rate();
+    public function rate($amount, $from, $to);
 
 }

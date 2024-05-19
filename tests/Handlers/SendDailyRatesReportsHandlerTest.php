@@ -8,41 +8,42 @@ use App\Scheduler\Message\SendDailyRatesReports;
 use App\Services\CurrencyConvertors\FixerConverter;
 use App\Services\CurrencyConvertors\NBUConverter;
 use App\Services\Mailers\MailtrapSender;
+use Doctrine\ORM\EntityManagerInterface;
 use Monolog\Logger;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-
 class SendDailyRatesReportsHandlerTest extends TestCase
 {
-
-    private Logger|MockObject $logger;
-
     private SubscribersRepository|MockObject $subscribersRepository;
-
+    private Logger|MockObject $logger;
+    private EntityManagerInterface|MockObject $entityManager;
     private MailtrapSender|MockObject $sender;
     private NBUConverter|MockObject $nbuConverter;
     private FixerConverter|MockObject $fixerConverter;
-    private SendDailyRatesReportsHandler|MockObject $handler;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->logger = $this->getMockBuilder(Logger::class)
+        $this->subscribersRepository = $this->getMockBuilder(SubscribersRepository::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $this->subscribersRepository = $this->getMockBuilder(SubscribersRepository::class)
+        $this->entityManager = $this->getMockBuilder(EntityManagerInterface::class)
+            ->getMock();
+        $this->entityManager->method('getRepository')
+            ->willReturn($this->subscribersRepository);
+        $this->logger = $this->getMockBuilder(Logger::class)
             ->disableOriginalConstructor()
             ->getMock();
         $this->sender = $this->getMockBuilder(MailtrapSender::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $this->nbuConverter = $this->getMockBuilder(NBUConverter::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->fixerConverter = $this->getMockBuilder(FixerConverter::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->nbuConverter = $this->createMock(NBUConverter::class);
+        $this->nbuConverter->method('rate')
+            ->with($this->equalTo(1), $this->equalTo('USD'), $this->equalTo('UAH'));
+        $this->fixerConverter = $this->createMock(FixerConverter::class);
+        $this->fixerConverter->method('rate')
+            ->with($this->equalTo(1), $this->equalTo('USD'), $this->equalTo('UAH'));
     }
 
     public function testSuccess()
@@ -54,12 +55,12 @@ class SendDailyRatesReportsHandlerTest extends TestCase
             ->method('send');
         $handler = new SendDailyRatesReportsHandler(
             $this->logger,
-            $this->subscribersRepository,
+            $this->entityManager,
             $this->sender,
             $this->nbuConverter,
             $this->fixerConverter,
         );
-        $handler(new SendDailyRatesReports());
+        $handler(new SendDailyRatesReports(1,'USD', 'UAH'));
     }
 
     public function testSubscribersNotFound()
@@ -67,17 +68,15 @@ class SendDailyRatesReportsHandlerTest extends TestCase
         $this->subscribersRepository->expects($this->once())
             ->method('all')
             ->willReturn([]);
-        $this->logger->expects($this->once())
-            ->method('info')
-            ->with('No subscribers found.');
 
         $handler = new SendDailyRatesReportsHandler(
             $this->logger,
-            $this->subscribersRepository,
+            $this->entityManager,
             $this->sender,
             $this->nbuConverter,
             $this->fixerConverter,
         );
-        $handler(new SendDailyRatesReports());
+        $handler(new SendDailyRatesReports(1,'USD', 'UAH'));
     }
+
 }

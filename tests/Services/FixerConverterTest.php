@@ -35,7 +35,7 @@ class FixerConverterTest extends TestCase
         $apiKey = 'bd5ecd38484cafed7bf29a7e8ff5bab3';
         $converter = new FixerConverter($client, $apiKey);
 
-        $result = $converter->rate();
+        $result = $converter->rate(1, 'USD', 'UAH');
 
         $this->assertEquals('39.34517', $result);
     }
@@ -66,7 +66,7 @@ class FixerConverterTest extends TestCase
         $apiKey = 'bd5ecd38484cafed7bf29a7e8ff5bab3';
         $converter = new FixerConverter($client, $apiKey);
 
-        $result = $converter->rate();
+        $result = $converter->rate(1, 'USD', 'UAH');
 
         $this->assertNull($result);
     }

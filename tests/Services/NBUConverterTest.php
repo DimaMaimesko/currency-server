@@ -43,7 +43,7 @@ class NBUConverterTest extends TestCase
         $client->method('get')->willReturn($httpClientResponse);
         $converter = new NBUConverter($client);
 
-        $result = $converter->rate();
+        $result = $converter->rate(1, 'USD', 'UAH');
 
         $this->assertEquals('39.4305', $result);
     }
@@ -76,7 +76,7 @@ class NBUConverterTest extends TestCase
         $client->method('get')->willReturn($httpClientResponse);
         $converter = new NBUConverter($client);
 
-        $result = $converter->rate();
+        $result = $converter->rate(1, 'USD', 'UAH');
 
         $this->assertNull($result);
     }

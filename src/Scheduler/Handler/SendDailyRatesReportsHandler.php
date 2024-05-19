@@ -28,14 +28,14 @@ class SendDailyRatesReportsHandler
 
     public function __invoke(SendDailyRatesReports $message)
     {
-        $rate = $this->calculateRate();
+        $rate = $this->calculateRate($message->amount, $message->from, $message->to);
         $this->sendMessagesToSubscribers($rate);
     }
 
-    private function calculateRate()
+    private function calculateRate($amount, $from, $to)
     {
         $convertor = new ChainConverter($this->nbuConverter, $this->fixerConverter);
-        return $convertor->rate();
+        return $convertor->rate($amount, $from, $to);
     }
 
     private function sendMessagesToSubscribers($rate): void

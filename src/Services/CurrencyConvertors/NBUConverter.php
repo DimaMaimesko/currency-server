@@ -7,21 +7,22 @@ use App\Services\HttpClient;
 class NBUConverter implements CurrencyConvertorInterface
 {
     private $baseUri = 'https://bank.gov.ua/NBUStatService/v1/statdirectory/exchange?json';
-    private $targetCurrency = 'USD';
+
 
     public function __construct(protected HttpClient $client)
     {
 
     }
 
-    public function rate(): ?string
+    public function rate($amount, $from, $to): ?string
     {
+        $targetCurrency = $from;
         $data = $this->client->get($this->baseUri);
         if (empty($data)) {
             return null;
         }
 
-        return $this->findCurrencyInData($data, $this->targetCurrency);
+        return $this->findCurrencyInData($data, $targetCurrency);
     }
 
 

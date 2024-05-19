@@ -15,7 +15,7 @@ class ChainConvertorTest extends TestCase
             $this->mockConvertor(null),
         ];
         $chainConvertor = new ChainConverter(...$convertors);
-        $result = $chainConvertor->rate();
+        $result = $chainConvertor->rate(1, 'USD', 'UAH');
         $this->assertEquals('12345', $result);
 
         $convertors = [
@@ -23,7 +23,7 @@ class ChainConvertorTest extends TestCase
             $this->mockConvertor('12345'),
         ];
         $chainConvertor = new ChainConverter(...$convertors);
-        $result = $chainConvertor->rate();
+        $result = $chainConvertor->rate(1, 'USD', 'UAH');
         $this->assertEquals('12345', $result);
 
 

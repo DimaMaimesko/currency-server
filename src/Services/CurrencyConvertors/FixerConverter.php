@@ -15,7 +15,7 @@ class FixerConverter implements CurrencyConvertorInterface
 
     }
 
-    public function rate(): ?string
+    public function rate($amount, $from, $to): ?string
     {
         $baseUrl = "http://data.fixer.io/api/latest";
         $data = $this->client->get($baseUrl, $this->fixerApiKey);
@@ -23,19 +23,19 @@ class FixerConverter implements CurrencyConvertorInterface
             return null;
         }
 
-        return $this->findCurrencyInData($data);
+        return $this->findCurrencyInData($data, $amount, $from, $to);
     }
 
 
 
-    private function findCurrencyInData(array $data): ?string
+    private function findCurrencyInData(array $data, $amount, $from, $to): ?string
     {
-        $usdRate = $data['rates']['USD'] ?? 0;
-        $uahRate = $data['rates']['UAH'] ?? 0;
+        $usdRate = $data['rates'][$from] ?? 0;
+        $uahRate = $data['rates'][$to] ?? 0;
         if(empty($usdRate) || empty($uahRate)){
             return null;
         }
 
-        return (string) round($uahRate / $usdRate, 5);
+        return (string) (round($uahRate / $usdRate, 5) * $amount);
     }
 }

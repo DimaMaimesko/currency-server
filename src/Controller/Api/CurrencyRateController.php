@@ -24,7 +24,7 @@ class CurrencyRateController extends AbstractController
             $this->nbuConverter,
             $this->fixerConverter,
         );
-        $rate = $convertor->rate();
+        $rate = $convertor->rate(1, 'USD', 'UAH');
 
         return $this->json($rate);
     }
