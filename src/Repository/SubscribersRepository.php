@@ -6,42 +6,42 @@ use App\Model\Entities\Email;
 use App\Model\Entities\Subscriber;
 use App\Model\EntityNotFoundException;
 use App\Model\User\Entity\User\User;
-use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\Config\Definition\Exception\Exception;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 
-class SubscribersRepository
+class SubscribersRepository extends ServiceEntityRepository
 {
+
+    public function __construct(ManagerRegistry $registry)
+    {
+        parent::__construct($registry, Subscriber::class);
+    }
+
     /**
-     * @var \Doctrine\ORM\EntityRepository
+     * @return Subscriber[]
      */
-    private $repo;
-    public function __construct(protected EntityManagerInterface $entityManager)
+    public function findByEmail(Email $email): array
     {
-        $this->repo = $this->entityManager->getRepository(Subscriber::class);
+        $email = $email->getValue();
+        return $this->createQueryBuilder('s')
+                ->andWhere('s.email = :val')
+                ->setParameter('val', $email)
+                ->orderBy('s.id', 'ASC')
+                ->getQuery()
+                ->getResult()
+            ;
     }
 
-    public function findByEmail(Email $email): ?Subscriber
-    {
-         return $this->repo->findOneBy(['email' => $email->getValue()]);
-    }
-
-    public function getByEmail(Email $email): Subscriber
-    {
-        if (!$subscriber = $this->repo->findOneBy(['email' => $email->getValue()])) {
-            throw new Exception('User is not found.');
-        }
-        return $subscriber;
-    }
-
-    public function add(Subscriber $subscriber): void
-    {
-        $this->entityManager->persist($subscriber);
-        $this->entityManager->flush();
-    }
-
+    /**
+     * @return Subscriber[]
+     */
     public function all(): array
     {
-        return $this->repo->findAll();
+        return $this->createQueryBuilder('s')
+            ->orderBy('s.id', 'ASC')
+            ->getQuery()
+            ->getResult()
+            ;
     }
 
 }

@@ -2,6 +2,7 @@
 
 namespace App\Scheduler\Handler;
 
+use App\Model\Entities\Subscriber;
 use App\Notifications\DailyUSDToUAHReport;
 use App\Repository\SubscribersRepository;
 use App\Scheduler\Message\SendDailyRatesReports;
@@ -9,6 +10,7 @@ use App\Services\CurrencyConvertors\ChainConverter;
 use App\Services\CurrencyConvertors\FixerConverter;
 use App\Services\CurrencyConvertors\NBUConverter;
 use App\Services\Mailers\MailtrapSender;
+use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 
 class SendDailyRatesReportsHandler
@@ -16,7 +18,7 @@ class SendDailyRatesReportsHandler
 
     public function __construct(
         protected LoggerInterface $logger,
-        protected SubscribersRepository $subscribersRepository,
+        protected EntityManagerInterface $entityManager,
         protected MailtrapSender $sender,
         protected NBUConverter $nbuConverter,
         protected FixerConverter $fixerConverter
@@ -38,7 +40,7 @@ class SendDailyRatesReportsHandler
 
     private function sendMessagesToSubscribers($rate): void
     {
-        $subscribers = $this->subscribersRepository->all();
+        $subscribers = $this->entityManager->getRepository(Subscriber::class)->all();
 
         if (empty($subscribers)) {
             $this->logger->info('No subscribers found.');
