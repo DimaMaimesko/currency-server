@@ -7,7 +7,6 @@ use Symfony\Component\Scheduler\Attribute\AsSchedule;
 use Symfony\Component\Scheduler\RecurringMessage;
 use Symfony\Component\Scheduler\Schedule;
 use Symfony\Component\Scheduler\ScheduleProviderInterface;
-use Symfony\Component\Scheduler\Scheduler;
 use Symfony\Contracts\Cache\CacheInterface;
 
 #[AsSchedule]
@@ -22,8 +21,6 @@ final class MainSchedule implements ScheduleProviderInterface
     {
         return (new Schedule())
             ->add(
-                // @TODO - Create a Message to schedule
-                RecurringMessage::every('10 seconds', new SendDailyRatesReports()),
                 RecurringMessage::cron('@daily', new SendDailyRatesReports())
             );
         ;

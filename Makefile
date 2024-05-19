@@ -4,12 +4,14 @@ setup: env-prepare build install db-create db-migrate run-worker
 down:
 	docker compose down --remove-orphans
 up:
-	docker compose up --pull always -d --wait
+	docker compose up -d
+	docker exec -it currency-server-php-1 nohup php bin/console messenger:consume -vv > output.log &
 run-worker:
-	docker exec -it currency-server-php-1 php bin/console messenger:consume -vv
+	docker exec -it currency-server-php-1 nohup php bin/console messenger:consume -vv > output.log &
 env-prepare:
 	cp -n .env.example .env
-
+tests:
+	docker exec -it currency-server-php-1 ./vendor/bin/phpunit
 
 
 build:

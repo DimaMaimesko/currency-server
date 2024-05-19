@@ -1,51 +1,33 @@
-# Symfony Docker
+# Currency Rates Service
 
-A [Docker](https://www.docker.com/)-based installer and runtime for the [Symfony](https://symfony.com) web framework,
-with [FrankenPHP](https://frankenphp.dev) and [Caddy](https://caddyserver.com/) inside!
 
-![CI](https://github.com/dunglas/symfony-docker/workflows/CI/badge.svg)
 
 ## Getting Started
 
 1. If not already done, [install Docker Compose](https://docs.docker.com/compose/install/) (v2.10+)
-2. Run `docker compose build --no-cache` to build fresh images
-3. Run `docker compose up --pull always -d --wait` to set up and start a fresh Symfony project
-4. Open `https://localhost` in your favorite web browser and [accept the auto-generated TLS certificate](https://stackoverflow.com/a/15076602/1352334)
-5. Run `docker compose down --remove-orphans` to stop the Docker containers.
+2. Run `make setup` to set up a project. It includes building fresh images, install dependencies, setup database, apply migrations and run scheduler worker in background.  
+3. Run `make down` to stop and remove containers
+4. Run `make up` to start containers and run scheduler worker in background
+5. Run `make tests` to run tests
 
 ## Features
 
-* Production, development and CI ready
-* Just 1 service by default
-* Blazing-fast performance thanks to [the worker mode of FrankenPHP](https://github.com/dunglas/frankenphp/blob/main/docs/worker.md) (automatically enabled in prod mode)
-* [Installation of extra Docker Compose services](docs/extra-services.md) with Symfony Flex
-* Automatic HTTPS (in dev and prod)
-* HTTP/3 and [Early Hints](https://symfony.com/blog/new-in-symfony-6-3-early-hints) support
-* Real-time messaging thanks to a built-in [Mercure hub](https://symfony.com/doc/current/mercure.html)
-* [Vulcain](https://vulcain.rocks) support
-* Native [XDebug](docs/xdebug.md) integration
-* Super-readable configuration
+* Get USD to UAH rate: `GET: http://localhost:80/api/rate`
+* Subscribe email to get daily notifications: `POST: http://localhost:80/api/subscribe`
 
-**Enjoy!**
+## Коментарі та опис логіки
 
-## Docs
 
-1. [Options available](docs/options.md)
-2. [Using Symfony Docker with an existing project](docs/existing-project.md)
-3. [Support for extra services](docs/extra-services.md)
-4. [Deploying in production](docs/production.md)
-5. [Debugging with Xdebug](docs/xdebug.md)
-6. [TLS Certificates](docs/tls.md)
-7. [Using MySQL instead of PostgreSQL](docs/mysql.md)
-8. [Using Alpine Linux instead of Debian](docs/alpine.md)
-9. [Using a Makefile](docs/makefile.md)
-10. [Updating the template](docs/updating.md)
-11. [Troubleshooting](docs/troubleshooting.md)
 
-## License
+Для отримання актуального курсу долара у гривні використовую сервіс від НБУ який реалізував у класі `src\Services\CurrencyConvertors\NBUConvertor.php` та Fixer у класі `src\Services\CurrencyConvertors\FixerConvertor.php`.
 
-Symfony Docker is available under the MIT License.
+ Також зробив клас `src\Services\CurrencyConvertors\ChainConvertor.php`. Він в якості аргументів приймає різні типи конверторів і робить їх послідовне опитування, повертає результат того хто перший відповів. Якщо ніхто не відповів - повертає null. Це зроблено щоб збільшити надійність системи, бо кожен сервіс при деяких обставинах може відвалитися - викинути exception (наприклад, сервіс від НБУ працює тільки для України). У цьому разі ChainConvertor мютує exception та продовжує опитувати наступні сервіси.
+
+Таким чином при бажанні можна буде додавати інші валютні сервіси, головне щоб вони імплементували `CurrencyConvertorInterface`,  та у клієнтському коді додавати їх у клас `ChainConvertor`, як це зроблено у класі `CurrencyRateController` (спочатку ті що більш надійні).
+
+Для щоденної відправки емейлів використовую сімфонівський Scheduler. Щоб це працювало потрібно щоб був запущений процес Worker, він запускається у фоні автоматично командами  `make setup` або `make up`.
+
 
 ## Credits
 
-Created by [Kévin Dunglas](https://dunglas.dev), co-maintained by [Maxime Helias](https://twitter.com/maxhelias) and sponsored by [Les-Tilleuls.coop](https://les-tilleuls.coop).
+Created by [Dmytro Maimesko]().
