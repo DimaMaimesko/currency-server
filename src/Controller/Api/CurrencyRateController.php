@@ -26,6 +26,10 @@ class CurrencyRateController extends AbstractController
         );
         $rate = $convertor->rate(1, 'USD', 'UAH');
 
+        if ($rate === null) {
+                return $this->json(['error' => 'Invalid status value'], 400);
+            }
+
         return $this->json($rate);
     }
 
